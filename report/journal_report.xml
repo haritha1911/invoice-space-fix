@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="isha_custom_journal_report">
+        <t t-call="web.external_layout">
+            <t t-set="o" t-value="o.with_context(lang=lang)"/>
+            <div class="page">
+                <h3>
+                    <strong>
+                        <span t-field="o.name"/>
+                    </strong>
+                </h3>
+                <div class="mb-4 mt-3">
+                    <div class="row">
+                        <div class="col-6">
+                            <t t-if="o.ref">
+                                Ref:
+                                <span t-field="o.ref"/>
+                                <br/>
+                            </t>
+                            <t t-if="o.department_id">
+                                Department:
+                                <span t-field="o.department_id.name"/>
+                                <br/>
+                            </t>
+                        </div>
+                        <div class="col-6">
+                            <t t-if="o.date">
+                                Date:
+                                <span t-field="o.date"/>
+                                <br/>
+                            </t>
+                            <t t-if="o.journal_id">
+                                Journal:
+                                <span t-field="o.journal_id.name"/>
+                                <br/>
+                            </t>
+                            <t t-if="o.company_id">
+                                Company:
+                                <span t-field="o.company_id.name"/>
+                                <br/>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-sm o_main_table" name="invoice_line_table">
+                    <thead>
+                        <tr>
+                            <th name="th_account" class="text-start">
+                                <span>Account</span>
+                            </th>
+                            <th name="th_partner" class="text-end">
+                                <span>Partner</span>
+                            </th>
+                            <th name="th_label" class="text-centre">
+                                <span>Label</span>
+                            </th>
+                            <th name="th_debit">
+                                <span>Debit</span>
+                            </th>
+                            <th name="th_credit">
+                                <span>Credit</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="invoice_tbody">
+                        <t t-set="credit_total" t-value="0"/>
+                        <t t-set="debit_total" t-value="0"/>
+                        <t t-foreach="o.invoice_line_ids" t-as="line">
+                            <tr t-att-class="'bg-200 fw-bold o_line_section'">
+                                <td name="td_account">
+                                    <span t-field="line.account_id.name"/>
+                                </td>
+                                <td name="td_partner">
+                                    <span t-field="line.partner_id.name"/>
+                                </td>
+                                <td name="td_label">
+                                    <span t-field="line.name"/>
+                                </td>
+                                <td name="td_debit">
+                                    <t t-set="debit_total" t-value="debit_total + line.debit"/>
+                                    <span t-field="line.debit"/>
+                                </td>
+                                <td name="td_credit">
+                                    <t t-set="credit_total" t-value="credit_total + line.credit"/>
+                                    <span t-field="line.credit"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <tr>
+                            <td colspan="3"></td>
+                            <td>
+                                <span t-esc="debit_total"/>
+                            </td>
+                            <td>
+                                <span t-esc="credit_total"/>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+</odoo>

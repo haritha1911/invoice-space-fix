@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="custom_paperformat_isha_invoice_report_format" model="report.paperformat">
+        <field name="name">Isha invoice</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">55</field>
+        <field name="margin_bottom">15</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">56</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="account.account_invoices" model="ir.actions.report">
+        <field name="name">Invoice</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">isha_invoice_report_format.custom_account_invoices</field>
+        <field name="report_file">isha_invoice_report_format.custom_account_invoices</field>
+        <field name="print_report_name">(object._get_b2b_domestic_attachment_filename())</field>
+        <field name="attachment"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="custom_paperformat_isha_invoice_report_format"/>
+    </record>
+
+    <record id="action_invoice_thermal_print" model="ir.actions.report">
+        <field name="name">Invoice Thermal Print</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">isha_invoice_report_format.report_invoice_thermal_print</field>
+        <field name="report_file">isha_invoice_report_format.report_invoice_thermal_print</field>
+        <field name="print_report_name">(object._get_extended_report_filename())</field>
+        <field name="attachment">(object._get_extended_attachment_filename())</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- PRO FORMA Invoice -->
+
+    <record id="sale.action_report_pro_forma_invoice" model="ir.actions.report">
+        <field name="name">PROFORMA Invoice</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">isha_invoice_report_format.custom_report_proforma_invoice</field>
+        <field name="report_file">isha_invoice_report_format.custom_report_proforma_invoice</field>
+        <field name="print_report_name">(object._get_proforma_invoice_filename())</field>
+        <field name="attachment">(object._get_proforma_invoice_filename())</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="custom_paperformat_isha_invoice_report_format"/>
+    </record>
+
+    <record id="action_report_isha_account_payment" model="ir.actions.report">
+        <field name="name">Isha Payment</field>
+        <field name="model">account.payment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">isha_invoice_report_format.custom_account_payment</field>
+        <field name="report_file">isha_invoice_report_format.custom_account_payment</field>
+        <field name="binding_model_id" ref="account.model_account_payment"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="custom_paperformat_isha_invoice_report_format"/>
+    </record>
+
+    <record id="action_report_isha_custom_journal_report" model="ir.actions.report">
+        <field name="name">Isha Journal Report</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">isha_invoice_report_format.custom_journal_report</field>
+        <field name="report_file">isha_invoice_report_format.custom_journal_report</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="custom_paperformat_isha_invoice_report_format"/>
+    </record>
+
+</odoo>

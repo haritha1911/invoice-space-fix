@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<template id="custom_report_proforma_invoice">
+		<t t-call="web.html_container">
+			<t t-foreach="docs" t-as="o">
+				<t t-set="lang" t-value="o.partner_id.lang"/>
+				<t t-call="isha_invoice_report_format.custom_report_proforma_invoice_report" t-lang="lang"/>
+			</t>
+		</t>
+	</template>
+
+	<template id="custom_account_invoices">
+		<t t-call="web.html_container">
+			<t t-foreach="docs" t-as="o">
+				<t t-set="lang" t-value="o.partner_id.lang"/>
+				<t t-call="isha_invoice_report_format.custom_report_isha_invoice" t-lang="lang"/>
+			</t>
+		</t>
+	</template>
+
+	<template id="report_invoice_thermal_print">
+<!--		<t t-call="web.html_container">-->
+			<t t-foreach="docs" t-as="o">
+				<t t-set="lang" t-value="o.partner_id.lang"/>
+				<t t-call="isha_invoice_report_format.invoice_thermal_print" t-lang="lang"/>
+			</t>
+<!--		</t>-->
+	</template>
+
+	<template id="custom_account_payment">
+		<t t-call="web.html_container">
+			<t t-foreach="docs" t-as="o">
+				<t t-set="lang" t-value="o.partner_id.lang"/>
+				<t t-call="isha_invoice_report_format.custom_report_isha_payment" t-lang="lang"/>
+			</t>
+		</t>
+	</template>
+
+	<template id="custom_journal_report">
+		<t t-call="web.html_container">
+			<t t-foreach="docs" t-as="o">
+				<t t-set="lang" t-value="o.partner_id.lang"/>
+				<t t-call="isha_invoice_report_format.isha_custom_journal_report" t-lang="lang"/>
+			</t>
+		</t>
+	</template>
+	<!-- https://timesheet.odoo.com/web#id=1280&cids=1&menu_id=112&action=184&active_id=10&model=project.task&view_type=form -->
+	<template id="isha_company_information">
+        <t t-set="company_names" t-value="[company['name'] for company in options['companies']]"/>
+        <div class="row">
+            <div class="col-10" t-out="', '.join(company_names)"/>
+        </div>
+
+        <address class="mb-0 o_text_muted" t-field="env.company.partner_id" t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}'/>
+
+        <t t-if="options.get('tax_unit', 'company_only') == 'company_only'">
+            GST: <t t-out="env.company.vat"/>
+        </t>
+        <t t-else="">
+            GST: <t t-out="env['account.tax.unit'].browse(options.get('tax_unit')).vat"/>
+        </t>
+    </template>
+	<template id="custom_pdf_export_main" inherit_id="account_reports.pdf_export_main">
+            
+		<xpath expr="//div[hasclass('o_header_font')]" position="replace">
+            <div class="row o_header_font">
+				<div class="col-8">
+					<!-- All company information (name, address, vat, ...) -->
+					<t t-call="{{custom_templates.get('company_information', 'isha_invoice_report_format.isha_company_information')}}"/>
+				</div>
+				<div class="col-4">
+					<!-- All filters and options -->
+					<t t-call="{{custom_templates.get('pdf_export_filters', 'account_reports.pdf_export_filters')}}"/>
+				</div>
+			</div>
+        </xpath>
+
+	</template>
+</odoo>

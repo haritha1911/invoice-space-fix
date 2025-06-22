@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="invoice_extend_layout_proforma_invoice">
+        <t t-set="company" t-value="o.company_id"/>
+
+        <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+            <div class="row" style="font-size: 10px !important;">
+                <div class="col-3 mb4">
+                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 45px;"
+                         alt="Logo"/>
+                </div>
+                <div class="col-9" style="margin-top:22px;margin-left:130px"><h2>Proforma Invoice</h2></div>
+            </div>
+            
+            <div t-if="company.logo or company.report_header" class="row zero_min_height">
+                <div class="col-12">
+                    <div style="border-bottom: 1px solid black;"/>
+                </div>
+            </div>
+            <div class="row" style="font-size: 12px !important;">
+                
+                <div class="col-6" name="company_address">
+                    
+                        <div name="company_address" style="font-size:16px !important;font-weight: bold !important">
+                                <ul class="list-unstyled" name="company_address_list">
+                                    <li t-if="company.is_company_details_empty"><span t-field="company.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": true}'>
+                                        <div class="bg-light border-1 rounded h-100 d-flex flex-column align-items-center justify-content-center p-4 w-100 opacity-75 text-muted text-center">
+                                            <strong>Company address block</strong>
+                                            <div>Contains the company address.</div>
+                                        </div>
+                                    </span></li>
+                                    <li t-else="">
+                                        <span t-field="company.company_details">
+                                            <div class="bg-light border-1 rounded h-100 d-flex flex-column align-items-center justify-content-center p-4 w-100 opacity-75 text-muted text-center">
+                                                <strong>Company details block</strong>
+                                                <div>Contains the company details.</div>
+                                            </div>
+                                        </span>
+                                    </li>
+                                    <li t-if="not forced_vat"/>
+                                    <li t-else="">
+                                        <t t-esc="company.country_id.vat_label or 'Tax ID'">Tax ID</t>:
+                                        <span t-esc="forced_vat">US12345671</span>
+                                    </li>
+                                    <li t-if="company.email">
+                                        Email:- <t t-esc="company.email"/>
+                                    </li>
+                                    <li t-if="company.phone">
+                                        Phone:- <t t-esc="company.phone"/>
+                                    </li>
+                                    <!-- <li t-if="company.iec_code">
+                                        PAN/IEC Code:- <t t-esc="company.iec_code"/>
+                                    </li> -->
+
+                                </ul>
+                        </div>
+                </div>
+                
+<!--                <div class="col-3" style="font-size: 16px !important;">-->
+<!--                    <t t-if="o.warehouse_id">-->
+<!--                        <span style="font-size:13px;">-->
+<!--                            <strong>Dispatch Address</strong>-->
+<!--                        </span>-->
+<!--                        <br/>-->
+<!--                        <strong class="text-left">-->
+<!--                            <span t-field="o.warehouse_id.partner_id.name" style="font-weight:900;opacity:1;"/>-->
+<!--                        </strong>-->
+<!--                        <div>-->
+<!--                            <span t-field="o.warehouse_id.partner_id.street"/>-->
+<!--                        </div>-->
+<!--                        <div>-->
+<!--                            <span t-field="o.warehouse_id.partner_id.street2"/>&amp;nbsp;-->
+<!--                            <span t-field="o.warehouse_id.partner_id.city"/>&amp;nbsp;-->
+<!--                            <span t-field="o.warehouse_id.partner_id.zip"/>&amp;nbsp;-->
+<!--                            <span t-field="o.warehouse_id.partner_id.country_id.name"/>-->
+<!--                        </div>-->
+<!--                        <span t-if="o.warehouse_id.partner_id.vat">-->
+<!--                            <span t-field="o.warehouse_id.partner_id.vat"/>-->
+<!--                            <br/>-->
+<!--                        </span>-->
+<!--                        <span t-if="o.warehouse_id.partner_id.state_id">-->
+<!--                            State Name:<span t-field="o.warehouse_id.partner_id.state_id.name"/>-->
+<!--                            <br/>-->
+<!--                        </span>-->
+<!--                        <span t-if="o.warehouse_id.partner_id.email">-->
+<!--                            Email:<span t-field="o.warehouse_id.partner_id.email"/>-->
+<!--                            <br/>-->
+<!--                        </span>-->
+<!--                        <span t-if="o.warehouse_id.partner_id.phone">-->
+<!--                            Phone:<span t-field="o.warehouse_id.partner_id.phone"/>-->
+<!--                            <br/>-->
+<!--                        </span>-->
+<!--                    </t>-->
+<!--                </div>-->
+
+            </div>
+        </div>
+
+        <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout {{  'o_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}"
+             t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' if company.layout_background == 'Geometric' else ''}});"
+             t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+             t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <div>
+                <t t-call="web.address_layout"/>
+            </div>
+            <t t-out="0"/>
+        </div>
+
+        <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
+            <div class="text-center" style="border-top: 1px solid black;">
+                <ul class="list-inline mb4">
+                    <div t-field="company.report_footer"/>
+                </ul>
+
+                <div t-if="report_type == 'pdf'" class="text-muted">
+                    Page:<span class="page"/>/
+                    <span class="topage"/>
+                </div>
+            </div>
+        </div>
+
+    </template>
+
+	<template id="invoice_extend_layout_standard">
+		<t t-set="company" t-value="o.company_id"/>
+
+		<div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+            <div class="row" style="font-size: 10px !important;">
+                <div class="col-3 mb4">
+                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 45px;"
+                         alt="Logo"/>
+                </div>
+
+                <div class="col-9" style="margin-top:22px;margin-left:130px"><h2><t t-esc="o.get_report_name_custom()"/></h2></div>
+            </div>
+            
+            <div t-if="company.logo or company.report_header" class="row zero_min_height">
+                <div class="col-12">
+                    <div style="border-bottom: 1px solid black;"/>
+                </div>
+            </div>
+            <div class="row" style="font-size: 12px !important;">
+                <div class="col-5" name="company_address">
+<!--                    <div class="row">-->
+                    <div name="company_address" style="font-size:16px !important;font-weight: bold !important">
+                        <ul class="list-unstyled" name="company_address_list">
+                            <li t-if="company.is_company_details_empty"><span t-field="company.partner_id" t-options='{"widget": "contact", "fields": ["address", "name","vat"], "no_marker": true}'>
+                                <div class="bg-light border-1 rounded h-100 d-flex flex-column align-items-center justify-content-center p-4 w-100 opacity-75 text-muted text-center">
+                                    <strong>Company address block</strong>
+                                    <div>Contains the company address.</div>
+                                </div>
+                            </span></li>
+                            <li t-else="">
+                                <span t-field="company.company_details">
+                                    <div class="bg-light border-1 rounded h-100 d-flex flex-column align-items-center justify-content-center p-4 w-100 opacity-75 text-muted text-center">
+                                        <strong>Company details block</strong>
+                                        <div>Contains the company details.</div>
+                                    </div>
+                                </span>
+                            </li>
+                            <li t-if="not forced_vat"/>
+                            <li t-else="">
+                                <t t-esc="company.country_id.vat_label or 'Tax ID'">Tax ID</t>:
+                                <span t-esc="forced_vat">US12345671</span>
+                            </li>
+                            <li t-if="company.email">
+                                Email:- <t t-esc="company.email"/>
+                            </li>
+                            <li t-if="company.phone">
+                                Phone:- <t t-esc="company.phone"/>
+                            </li>
+                            <!-- <li t-if="company.iec_code">
+                                PAN/IEC Code:- <t t-esc="company.iec_code"/>
+                            </li> -->
+
+                        </ul>
+                    </div>
+<!--                    </div>-->
+                </div>
+                
+                <div class="col-4" style="font-size: 16px !important;">
+                    <t t-if="o.journal_id and o.journal_id.enable_dispatch_add and o.move_type in ('out_invoice', 'in_invoice')">
+                        <t t-if="o.dispatched_partner_id">
+                            <span style="font-size:13px;">
+                                <strong style="font-size:18px;font-weight: bold !important">Dispatch Address</strong>
+                            </span>
+                            <br/>
+                            <strong class="text-left">
+                                <t t-set="org_company_name" t-value="o.get_org_company_name()"/>
+                                <t t-if="org_company_name and org_company_name == 'isha_fnd'">
+                                    <span style="font-weight:900;opacity:1;">Isha Foundation</span>
+                                </t>
+                                <t t-else="">
+                                    <span t-field="o.dispatched_partner_id.name" style="font-weight:900;opacity:1;"/>
+                                </t>
+                            </strong>
+                            <div>
+                                <span t-field="o.dispatched_partner_id.street"/>
+                            </div>
+                            <div>
+                                <span t-field="o.dispatched_partner_id.street2"/>&amp;nbsp;
+                                <span t-field="o.dispatched_partner_id.city"/>&amp;nbsp;
+                                <span t-field="o.dispatched_partner_id.zip"/>&amp;nbsp;
+                                <span t-field="o.dispatched_partner_id.country_id.name"/>
+                            </div>
+                            <t t-if="o.dispatched_partner_id.phone">
+                                <span class="text-left">Contact:&amp;nbsp;</span>
+                                <span class="text-left" t-field="o.dispatched_partner_id.phone"/>
+                                <br/>
+                            </t>
+                            <span t-if="o.dispatched_partner_id.vat">
+                                <span t-field="o.dispatched_partner_id.vat"/>
+                                <br/>
+                            </span>
+                            <span t-if="o.dispatched_partner_id.state_id">
+                                State Name:<span t-field="o.dispatched_partner_id.state_id.name"/>
+                                <br/>
+                            </span>
+                        </t>
+                    </t>
+                    <t t-if="o.hide_details_for_all_branch() and o.move_type in ('in_invoice','in_refund') and o.journal_id and not o.journal_id.enable_dispatch_add">
+                        <p style="margin-top: 30px;text-align:center;">
+                            <p style="text-align: center;">
+                                <span t-field="o.id" t-options='{"widget": "payment"}'/>
+                            </p>
+                            <img
+                                    style="display:block;margin: 0 auto;"
+                                    t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s'%('Code128', o.id, 300, 50)"/>
+                        </p>
+                    </t>
+                </div>
+                
+                <!-- https://timesheet.odoo.com/web#id=877&cids=1&menu_id=112&action=184&active_id=4&model=project.task&view_type=form -->
+                <!-- Added posting date and posting No. based on the condition -->
+                
+                <div t-if="o.hide_details_for_all_branch()" class="col-3" name="posting_details">
+                    <t t-if="o.company_id.country_id.name == 'India' and o.move_type not in ('out_invoice', 'out_refund')">
+                        <h4>
+                            Posting Date:
+                        </h4>
+                        <h4>
+                            Posting No:
+                        </h4>
+                    </t>
+                    <t t-if="o.move_type in ('in_invoice','in_refund') and o.journal_id and o.journal_id.enable_dispatch_add">
+                        <p style="margin-top: 30px; text-align: center;">
+                            <p style="text-align: center;">
+                                <span t-field="o.id" t-options="{&quot;widget&quot;: &quot;payment&quot;}"/>
+                            </p>
+                            <img style="display:block;margin: 0 auto;" t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s'%('Code128', o.id, 300, 50)"/>
+                        </p>
+                    </t>
+                </div>
+            </div>
+        </div>
+
+        <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout {{  'o_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}"
+             t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' if company.layout_background == 'Geometric' else ''}});"
+             t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+             t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <div>
+                <t t-call="web.address_layout"/>
+            </div>
+            <t t-out="0"/>
+        </div>
+
+        <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
+            <div class="text-center" style="border-top: 1px solid black;">
+<!--                <ul class="list-inline mb4">-->
+<!--                    <div t-field="company.report_footer"/>-->
+<!--                </ul>-->
+
+<!--                <div t-if="report_type == 'pdf'" class="text-muted">-->
+<!--                    Page:<span class="page"/>/-->
+<!--                    <span class="topage"/>-->
+<!--                </div>-->
+            </div>
+        </div>
+
+	</template>
+</odoo>

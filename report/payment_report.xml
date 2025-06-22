@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- https://timesheet.odoo.com/web#id=813&cids=1&menu_id=112&action=184&active_id=2&model=project.task&view_type=form -->
+    <template id="custom_report_isha_payment">
+        <t t-call="web.external_layout">
+            <t t-set="o" t-value="o.with_context(lang=lang)"/>
+            <div class="page">
+                <h3><strong>Payment Receipt: <span t-field="o.name"/></strong></h3>
+                <div class="mb-4 mt-3">
+                    <div class="row">
+                        <div class="col-6" t-if="o.payment_type">
+                            Payment Type:
+                            <span t-field="o.payment_type"/><br />
+                        </div>
+                        <div class="col-6" t-if="o.partner_id">
+                           <t t-if="o.partner_type == 'customer'">
+                                Customer:
+                            </t>
+                            <t t-if="o.partner_type == 'supplier'">
+                                Vendor:
+                            </t>
+                            <span t-field="o.partner_id.name"/><br />
+                        </div>
+                    </div>
+                    <div class="oe_structure"></div>
+                    <div class="row">
+                        <div class="col-6" t-if="o.department_id">
+                            Department:
+                            <span t-field="o.department_id.name"/><br />
+                        </div>
+                        <div class="col-6" t-if="o.amount">
+                            Payment Amount:
+                            <span t-field="o.amount"
+                                    t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                        </div>
+                    </div>
+                    <div class="oe_structure"></div>
+                    <div class="row">
+                        <div class="col-6" t-if="o.ref">
+                            Memo:
+                            <span t-field="o.ref"/>
+                        </div>
+                        <div class="col-6" t-if="o.date">
+                            Payment Date:
+                            <span t-field="o.date"/><br />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6" t-if="o.payment_method_id">
+                            Payment Method: <span t-field="o.payment_method_id.name"/><br />
+                        </div>
+                        <div class="col-6" t-if="o.advance_id">
+                            Advance: <span t-field="o.advance_id.name"/><br />
+                        </div>
+                    </div>
+                    <div class="oe_structure"></div>
+                    <div class="row">
+                        <div class="col-6" t-if="o.journal_id">
+                            Journal:<span t-field="o.journal_id.name"/><br/>
+                        </div>
+                        <div class="col-6" t-if="o.partner_bank_id">
+                            Bank Account:
+                            <span t-field="o.partner_bank_id.acc_number"/> - <span t-field="o.partner_bank_id.bank_name"/>                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,149 @@
+<odoo>
+    <data>
+        <!-- override the picking_print_hub's custom_report_pick_list_printout_for_thermal_printer for Indian format -->
+        <template id="picking_print_hub.custom_report_pick_list_for_thermal_printer">
+            <t t-foreach="docs" t-as="o">
+                <!-- Don't remove the class print-data on the parent div. this is the marker used
+                    to print the same in thermal printer -->
+                <div class="print-data" style="width:1000px; font-size: 20px; ">
+                    <t t-set="company" t-value="o.company_id"/>
+                    <div style="width:800px; text-align: center;">
+                        <span style="font-size:40px;" t-if="o.name != '/'" t-field="o.name"/>
+                    </div>
+                    <div style="width:800px; text-align: center;" t-field="o.name" t-options="{'widget': 'barcode', 'width': 1000, 'height': 200, 'img_style': 'width:500px;height:100px;'}"/>
+                    <div style="width:800px; font-size:25px;">
+                        <p style="text-align:left;">
+                            <span t-if="o.note != '/'" t-field="o.note"/>
+                        </p>
+                        <p style="text-align:left;">
+                            <span>Customer Name</span>&amp;nbsp;
+                            <span style="float:right;" t-if="o.partner_id.name != '/'" t-field="o.partner_id.name"/>
+                        </p>
+                        <p style="text-align:left;">
+                            <span t-if="o.carrier_id.name != '/'" t-field="o.carrier_id.name"/>&amp;nbsp;
+                            <span style="float:right;" t-if="o.sale_id.name != '/'" t-field="o.sale_id.name"/>
+                        </p>
+                    </div>
+                    <div style="width:800px" name="items">
+                        <table style="width:800px; font-size: 25px;" name="pick_list_table">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:center;" name="th_serial" width="15%">
+                                        <span>S No.</span>
+                                    </th>
+                                    <th name="th_description" style="text-align:left" width="65%">
+                                        <span>Product</span>
+                                    </th>
+                                    <th name="th_quantity" style="text-align:center" width="20%">
+                                        <span>Quantity</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <t t-set="lines" t-value="o.move_line_ids_without_package"/>
+                                <t t-set="count" t-value="1"/>
+                                <t t-set="tot_qty" t-value="0"/>
+                                <t t-set="order_amount" t-value="o.sale_id.amount_total"/>
+                                <t t-set="shipping_charge" t-value="0"/>
+                                <t t-foreach="o.sale_id.order_line" t-as="sale_line">
+                                    <t t-if="sale_line.product_id.is_delivery">
+                                        <t t-set="shipping_charge" t-value="shipping_charge + sale_line.price_total"/>
+                                    </t>
+                                </t>
+                                <!--                  <t t-set="tot_value" t-value="0"/>-->
+<!--                                <t t-set="aggregated_lines"-->
+<!--                                   t-value="o._get_aggregated_product_quantities(except_package=True)"/>-->
+
+                                <!--                            <t t-if=" aggregated_lines" name="no_package_move_lines">-->
+
+                                <!--                                        <tr t-foreach="move_lines" t-as="move_line">-->
+                                <!--                                            <td style="text-align:right; valign:top">-->
+                                <!--                                                <span t-field="move_lines.product"/>-->
+                                <!--                                            </td>-->
+                                <!--                                        </tr>-->
+
+                                <!--                            </t>-->
+
+                                <t t-foreach="lines" t-as="line">
+                                    <tr>
+                                        <t name="account_invoice_line_accountable">
+                                            <td style="text-align:center;" name="account_invoice_line_name">
+                                                <span t-esc="count"/>
+                                            </td>
+                                            <t t-set="count" t-value="count + 1"/>
+                                            <td name="account_invoice_line_name" style="text-align:left;">
+
+                                                <t t-if="line.product_id.barcode">[<span t-field="line.product_id.barcode"/>]
+                                                </t> <span t-field="line.product_id.name"  t-options="{'widget': 'text'}"/>
+                                                <span t-foreach="line.product_id.product_template_variant_value_ids" t-as="variant">
+                                                    <span t-field="variant.name"/>
+                                                </span>
+                                                <t t-if="line.lot_id.name"><br/>[LOT:<span t-field="line.lot_id.name"/>]</t>
+                                                <t t-if="line.description_bom_line"><br/>[<span t-field="line.description_bom_line"/>]</t>
+                                            </td>
+                                            <td style="text-align:right; valign:top">
+                                                <span t-field="line.quantity"/>
+                                                <span t-field="line.product_uom_id" groups="uom.group_uom"/>
+                                                <t t-set="tot_qty" t-value="tot_qty + line.quantity"/>
+                                            </td>
+                                            <!--                              <td style="text-align:right; valign:top">-->
+                                            <!--                                  <t t-foreach="line.picking_id.sale_id.order_line" t-as="order">-->
+                                            <!--                                      <t t-if="line.product_id == order.product_id">-->
+                                            <!--                                          <span t-field="order.price_total"/>-->
+                                            <!--                                          <t t-set="tot_value" t-value="tot_value + order.price_total"/>-->
+                                            <!--                                      </t>-->
+                                            <!--                                  </t>-->
+                                            <!--                              </td>-->
+                                        </t>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">
+                                            <hr/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <tr>
+                                    <td colspan="2">Total</td>
+                                    <td style="text-align:center;">
+                                        <span t-esc="'{0:,.2f}'.format(tot_qty)"/>
+                                        <span t-field="line.product_uom_id" groups="uom.group_uom"/>
+                                    </td>
+                                    <!--                      <td style="text-align:center;">-->
+                                    <!--                          <span t-field="o.company_id.currency_id.symbol"/>-->
+                                    <!--                          <span t-esc="'{0:,.2f}'.format(tot_value)"/>-->
+                                    <!--                      </td>-->
+                                </tr>
+                                <tr>
+                                    <td colspan="2">Shipping Charges</td>
+                                    <td style="text-align:center;">
+                                        <span t-field="o.company_id.currency_id.symbol"/>
+                                        <span t-esc="'{0:,.2f}'.format(shipping_charge)"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">Total Amount</td>
+                                    <td style="text-align:center;">
+                                        <span t-field="o.company_id.currency_id.symbol"/>
+                                        <span t-esc="'{0:,.2f}'.format(order_amount)"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p/>
+                    <p style="text-align:left; width:800px; border-bottom: 1px solid black;font-weight:bold;">Order Date:
+                        <span t-if="o.sale_id.date_order" t-field="o.sale_id.date_order"/>&amp;nbsp;
+                        <span style="float:right;" t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y  %H:%M:%S')"/>&amp;nbsp;
+                        <span style="float:right;">Printed at:</span>&amp;nbsp;
+                    </p>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                </div>
+            </t>
+        </template>
+    </data>
+</odoo>

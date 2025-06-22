@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="view_account_move_export_custom" model="ir.ui.view">
+        <field name="name">account.move.export.custom</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+
+            <field name='partner_id' position="after">
+                <!-- https://timesheet.odoo.com/web#id=2450&cids=1&menu_id=118&action=184&active_id=10&model=project.task&view_type=form -->
+                <!-- <label for="partner_id" string="Customer" style="font-weight:bold;" invisible="move_type not in ('out_invoice', 'out_refund', 'out_receipt') or context.get('apply_department_domain') != True"/>
+                <label for="partner_id" string="Vendor" style="font-weight:bold;" invisible="move_type not in ('in_invoice', 'in_refund', 'in_receipt') or context.get('apply_department_domain') != True"/> -->
+                <field name="partner_id" nolabel="1" 
+                    readonly="is_apply_read_only or state != 'draft'" 
+                    invisible="move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt') or context.get('apply_department_domain') != True"
+                    context="{'res_partner_search_mode': (context.get('default_move_type', 'entry') in ('out_invoice', 'out_refund', 'out_receipt') and 'customer') or (context.get('default_move_type', 'entry') in ('in_invoice', 'in_refund', 'in_receipt') and 'supplier') or False,
+                    'show_address': 1, 'default_is_company': True, 'show_vat': True,'show_pan':True}" 
+                    options="{'no_edit': True, 'no_create': True, 'no_open':True}">
+                </field>
+                <field name="dispatched_partner_id" readonly="is_apply_read_only or state != 'draft'"
+                        options="{'no_edit': True, 'no_create': True}"/>
+            </field>
+
+            <xpath expr="//field[@name='partner_shipping_id']" position="replace">
+
+
+                <field name="partner_shipping_id"
+                    groups="account.group_delivery_invoice_address"
+                    options="{'no_quick_create': True, 'no_create_edit': True, 'no_open': True}"
+                    context="{
+                                'res_partner_search_mode': (context.get('default_move_type', 'entry') in ('out_invoice', 'out_refund', 'out_receipt') and 'customer') or (context.get('default_move_type', 'entry') in ('in_invoice', 'in_refund', 'in_receipt') and 'supplier') or False,
+                                'show_address': 1, 'default_is_company': True, 'show_vat': True}"
+                    invisible="move_type not in ('out_invoice', 'out_refund', 'out_receipt') or not context.get('apply_department_domain', False)"
+
+                    readonly="state != 'draft'"/>
+
+                <field name="partner_shipping_id"
+                    groups="account.group_delivery_invoice_address"
+                    options="{'no_quick_create': True, 'no_create_edit': True}"
+                    context="{
+                                'res_partner_search_mode': (context.get('default_move_type', 'entry') in ('out_invoice', 'out_refund', 'out_receipt') and 'customer') or (context.get('default_move_type', 'entry') in ('in_invoice', 'in_refund', 'in_receipt') and 'supplier') or False,
+                                'show_address': 1, 'default_is_company': True, 'show_vat': True}"
+                    invisible="move_type not in ('out_invoice', 'out_refund', 'out_receipt') or context.get('apply_department_domain', False)"
+                    readonly="state != 'draft'"/>
+
+            </xpath>
+
+            <xpath expr="//group[@id='header_left_group']/field[@name='l10n_in_state_id']" position="attributes">
+                <attribute name="readonly">is_apply_read_only or state != 'draft'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="donner_info" invisible="not donner_info"/>
+            </xpath>
+        </field>
+    </record>
+
+    
+    <record id="address_account_journal_form_view" model="ir.ui.view">
+        <field name="name">account.journal.form.inherit.address</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account.view_account_journal_form" />
+        <field name="arch" type="xml">
+
+            <field name='currency_id' position="after">
+                <field name="enable_shipping_add"/>
+                <field name="enable_dispatch_add"/>
+            </field>
+            
+        </field>
+    </record>
+    
+
+    <record id="stock_location_lognote_form_view" model="ir.ui.view">
+        <field name="name">stock.location.form.inherit.lognote</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form" />
+        <field name="arch" type="xml">
+
+            <xpath expr="//sheet" position="after">
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+
+
+    <record id="view_sale_order_place_custom" model="ir.ui.view">
+        <field name="name">sale.order.place.export.custom</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <field name='partner_id' position="after">
+                <field name="country_id" invisible="1"/>
+                <!-- https://timesheet.odoo.com/web#id=3035&cids=1&menu_id=118&action=184&active_id=10&model=project.task&view_type=form-->
+                <field name="place_of_supply" options="{'no_quick_create': True, 'no_create_edit': True, 'no_open': True}" invisible="not context.get('apply_department_domain', False)"/>
+                <field name="place_of_supply" options="{'no_open': True}" invisible="context.get('apply_department_domain', False)"/>
+            </field>
+        </field>
+    </record>
+</odoo>
